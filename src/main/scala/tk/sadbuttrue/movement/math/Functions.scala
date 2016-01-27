@@ -1,6 +1,7 @@
 package tk.sadbuttrue.movement.math
 
 import breeze.linalg.{DenseMatrix, DenseVector}
+import breeze.numerics.{sin, toRadians, cos}
 import tk.sadbuttrue.movement.util.model.Task
 
 import scala.annotation.switch
@@ -26,5 +27,12 @@ object Functions {
     a(1, 1) = 1
     val x = a \ b
     x(0) * t + x(1)
+  }
+
+  def n_p(): DenseVector[Double] = {
+    val alpha = toRadians(20)
+    val beta = toRadians(41)
+    val gamma = toRadians(49)
+    DenseVector[Double](-cos(alpha), -cos(beta) * sin(alpha), -cos(gamma) * sin(alpha))
   }
 }
