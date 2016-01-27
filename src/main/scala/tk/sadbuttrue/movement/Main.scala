@@ -1,5 +1,6 @@
 package tk.sadbuttrue.movement
 
+import tk.sadbuttrue.movement.math.Functions
 import tk.sadbuttrue.movement.util.model.{DoubleWithError, Task}
 
 /**
@@ -8,4 +9,6 @@ import tk.sadbuttrue.movement.util.model.{DoubleWithError, Task}
 object Main extends App {
   val tmp = Task("sample.json")
   println(tmp)
+  val P = Functions.p(tmp)
+  println(P(47.0))
 }
