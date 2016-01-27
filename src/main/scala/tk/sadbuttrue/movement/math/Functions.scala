@@ -2,6 +2,7 @@ package tk.sadbuttrue.movement.math
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.numerics.{sin, toRadians, cos}
+import breeze.numerics.constants.Pi
 import tk.sadbuttrue.movement.util.model.Task
 
 import scala.annotation.switch
@@ -34,5 +35,12 @@ object Functions {
     val beta = toRadians(41)
     val gamma = toRadians(49)
     DenseVector[Double](-cos(alpha), -cos(beta) * sin(alpha), -cos(gamma) * sin(alpha))
+  }
+
+  def rho(task: Task): DenseVector[Double] = {
+    val x_c: Double = task.r_c(0)
+    val y_c: Double = task.r_c(1)
+    val z_c: Double = task.r_c(2)
+    DenseVector[Double](task.L - task.l - x_c, cos(Pi / 4.0) * task.R - y_c, sin(Pi / 4.0) * task.R - z_c)
   }
 }
