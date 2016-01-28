@@ -1,7 +1,7 @@
 package tk.sadbuttrue.movement
 
 import tk.sadbuttrue.movement.math.Functions
-import tk.sadbuttrue.movement.util.model.{DoubleWithError, Task}
+import tk.sadbuttrue.movement.util.model.Task
 
 /**
   * Created by true on 25/01/16.

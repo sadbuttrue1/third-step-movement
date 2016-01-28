@@ -3,6 +3,9 @@
 # http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
 
 target/
+web/target
+api/target
+core/target
 lib_managed/
 src_managed/
 project/boot/
@@ -16,6 +19,7 @@ project/boot/
 .lib/
 dist/*
 project/plugins/project/
+project/target
 
 # Scala-IDE specific
 .scala_dependencies
