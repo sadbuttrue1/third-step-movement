@@ -14,12 +14,25 @@ val app = crossProject.settings(
   .jsSettings(
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.8.0",
-      "com.github.japgolly.scalajs-react" %%% "core" % "0.8.1",
-      "eu.unicredit" %%% "paths-scala-js" % "0.4.0"
+      "eu.unicredit" %%% "paths-scala-js" % "0.4.0",
+      "com.github.japgolly.scalajs-react" %%% "core" % "0.10.4"
     ),
     jsDependencies ++= Seq(
-      "org.webjars" % "react" % "0.12.1" / "react-with-addons.js" commonJSName "React"
-    )
+      "org.webjars.bower" % "react" % "0.14.7" / "react-with-addons.js" commonJSName "React",
+
+      "org.webjars.bower" % "react" % "0.14.7"
+        / "react-with-addons.js"
+        minified "react-with-addons.min.js"
+        commonJSName "React",
+
+      "org.webjars.bower" % "react" % "0.14.7"
+        / "react-dom.js"
+        minified "react-dom.min.js"
+        dependsOn "react-with-addons.js"
+        commonJSName "ReactDOM"
+    ),
+    persistLauncher in Compile := true,
+    skip in packageJSDependencies := false
   ).jvmSettings(
   libraryDependencies ++= Seq(
     "io.spray" %% "spray-can" % "1.3.3",
@@ -34,7 +47,9 @@ val app = crossProject.settings(
 
 lazy val appJS = app.js
 lazy val appJVM = app.jvm.settings(
-  (resources in Compile) += (fullOptJS in(appJS, Compile)).value.data
+  (resources in Compile) += (fastOptJS in(appJS, Compile)).value.data,
+  (resources in Compile) += (packageJSDependencies in(appJS, Compile)).value,
+  (resources in Compile) += (packageScalaJSLauncher in(appJS, Compile)).value.data
 )
 
 
