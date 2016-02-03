@@ -9,12 +9,17 @@ val app = crossProject.settings(
   organization := "tk.sadbuttrue",
   name := "third-step-movement",
   version := "0.1",
-  scalaVersion := "2.11.7"
+  scalaVersion := "2.11.7",
+  scalacOptions ++= Seq(
+    "-feature",
+    "-language:implicitConversions",
+    "-language:postfixOps"
+  )
 ).enablePlugins(JavaServerAppPackaging)
   .jsSettings(
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.8.0",
-      "eu.unicredit" %%% "paths-scala-js" % "0.4.0",
+      "eu.unicredit" %%% "paths-scala-js" % "0.4.2",
       "com.github.japgolly.scalajs-react" %%% "core" % "0.10.4"
     ),
     jsDependencies ++= Seq(
@@ -29,7 +34,9 @@ val app = crossProject.settings(
         / "react-dom.js"
         minified "react-dom.min.js"
         dependsOn "react-with-addons.js"
-        commonJSName "ReactDOM"
+        commonJSName "ReactDOM",
+
+      "org.webjars.bower" % "paths-js" % "0.4.2" / "paths.js"
     ),
     persistLauncher in Compile := true,
     skip in packageJSDependencies := false
