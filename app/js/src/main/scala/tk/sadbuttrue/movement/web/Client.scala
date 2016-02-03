@@ -1,9 +1,11 @@
 package tk.sadbuttrue.movement.web
 
-import japgolly.scalajs.react.{BackendScope, ReactDOM, ReactComponentB, ReactEventI, Ref}
+import japgolly.scalajs.react._
 import org.scalajs.dom._
+import org.scalajs.dom.ext.Ajax
 import org.scalajs.dom.raw.{HTMLParagraphElement, HTMLInputElement}
 
+import scala.concurrent.Future
 import scala.scalajs.js
 import japgolly.scalajs.react.vdom.prefix_<^._
 
@@ -30,12 +32,20 @@ object Ajaxer extends autowire.Client[String, upickle.default.Reader, upickle.de
 object Client extends js.JSApp {
   val output = Ref[HTMLParagraphElement]("output")
   val jsonFile = Ref[HTMLInputElement]("jsonFile")
-  val sendButton = Ref[HTMLInputElement]("sendButton")
 
-  class Backend($: BackendScope[Unit, Unit]) {
+  implicit def futToCallback(fut: Future[Callback]): Callback = Callback(fut.foreach(_.runNow()))
+
+  case class State(
+                    selected: Boolean,
+                    v: Option[Seq[Seq[(Double, Double)]]],
+                    a: Option[Seq[Seq[(Double, Double)]]],
+                    w_d: Option[Seq[Seq[(Double, Double)]]],
+                    q_d: Option[Seq[Seq[(Double, Double)]]]
+                  )
+
+  class Backend($: BackendScope[Unit, State]) {
     def selected(e: ReactEventI) = {
-      sendButton($).get.disabled = false
-      $.setState(e.target.value)
+      $.modState(_.copy(selected = true))
     }
 
     def send = {
@@ -44,120 +54,68 @@ object Client extends js.JSApp {
       reader.readAsText(file)
       reader.onload = (ev: Event) => {
         val task = upickle.default.read[Task](reader.result.asInstanceOf[String])
-        output($).get.textContent = task.toString
         Ajaxer[Api].calculate(task).
-          call().foreach { result =>
-          output($).get.textContent = result.toString
+          call().map { result =>
+          val v = Some(
+            List(
+              result.t.zip(result.v(0)).toList,
+              result.t.zip(result.v(1)).toList,
+              result.t.zip(result.v(2)).toList
+            )
+          )
+          val a = Some(
+            List(
+              result.t.zip(result.a(0)).toList,
+              result.t.zip(result.a(1)).toList,
+              result.t.zip(result.a(2)).toList
+            )
+          )
+          val w_d = Some(
+            List(
+              result.t.zip(result.w_d(0)).toList,
+              result.t.zip(result.w_d(1)).toList,
+              result.t.zip(result.w_d(2)).toList
+            )
+          )
+          val q_d = Some(
+            List(
+              result.t.zip(result.quat_d(0)).toList,
+              result.t.zip(result.quat_d(1)).toList,
+              result.t.zip(result.quat_d(2)).toList,
+              result.t.zip(result.quat_d(3)).toList
+            )
+          )
+          $.modState(_.copy(
+            v = v,
+            a = a,
+            w_d = w_d,
+            q_d = q_d
+          ))
         }
-      }
-      $.state
+      }.runNow()
+      $.modState(_.copy(selected = false))
     }
 
-    def render =
+    def render(s: State) = {
       <.div(
         <.h1("choose json-file with task"),
         <.p(<.input(^.`type` := "file", ^.accept := "application/json", ^.multiple := false, ^.onChange ==> selected, ^.ref := jsonFile)),
         <.p(^.ref := output),
-        <.p(<.input(^.`type` := "button", ^.value := "send", ^.onClick --> send, ^.disabled := true, ^.ref := sendButton))
+        <.p(<.input(^.`type` := "button", ^.value := "send", ^.onClick --> send, ^.disabled := !s.selected)),
+        s.v.fold(<.div)(data => <.div(<.p("v:"), Line.LineChart(data))),
+        s.a.fold(<.div)(data => <.div(<.p("a:"), Line.LineChart(data))),
+        s.w_d.fold(<.div)(data => <.div(<.p("w_d:"), Line.LineChart(data))),
+        s.q_d.fold(<.div)(data => <.div(<.p("q_d:"), Line.LineChart(data)))
       )
+
+    }
   }
 
   val MovementApp = ReactComponentB[Unit]("MovementApp")
+    .initialState(State(false, None, None, None, None))
     .renderBackend[Backend]
     .buildU
 
   @JSExport
   override def main() = ReactDOM.render(MovementApp(), document.getElementById("contents"))
 }
-
-///**
-//  * Created by true on 31/01/16.
-//  */
-//
-//import autowire._
-//import japgolly.scalajs.react.ReactComponentB
-//import org.scalajs.dom
-//import org.scalajs.dom.html
-//import paths.high.Stock
-//import tk.sadbuttrue.movement.util.model.Task
-//
-//import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-//import scala.scalajs.js.annotation.JSExport
-//import scalatags.JsDom.all._
-//
-
-//
-//@JSExport
-//object Client extends {
-//  @JSExport
-//  def main(container: html.Div) = {
-//    val inputBox = input.render
-//    val output = span.render
-//    val jsonFile = input(`type` := "file", title := "json file", accept := "application/json", multiple := false).render
-//    val sendButton = input(`type` := "button", value := "send").render
-//    val clearButton = input(`type` := "button", value := "clear").render
-//    var task: Task = null
-//    def update() = Ajaxer[Api].calculate(task).
-//      call().foreach { data =>
-//      output.innerHTML = ""
-//      output.textContent = data.toString
-//      output.render
-//    }
-//    def show() = {
-//      val file = jsonFile.files.item(0)
-//      val reader = new dom.FileReader
-//      reader.readAsText(file)
-//      reader.onload = (e: dom.Event) => {
-//        task = upickle.default.read[Task](reader.result.asInstanceOf[String])
-//      }
-//    }
-//    def calculate() = Ajaxer[Api].calculate(task).
-//      call().foreach { result =>
-//      output.textContent = result.toString
-//      output.render
-//    }
-//    inputBox.onkeyup = (e: dom.Event) => update()
-//    jsonFile.onchange = (e: dom.Event) => show()
-//    sendButton.onclick = (e: dom.Event) => calculate()
-//    container.appendChild(
-//      div(
-//        h1("choose json-file with task"),
-//        p(jsonFile),
-//        p(sendButton, clearButton),
-//        output
-//      ).render
-//    )
-//  }
-//}
-
-//object line {
-//  import japgolly.scalajs.react._
-//  import japgolly.scalajs.react.vdom.svg.all._
-//  import paths.high.Stock
-//
-//  case class Event(x: Double, y: Double)
-//
-//
-//  val LineChart = ReactComponentB[Seq[Seq[Event]]]("Stock chart")
-//    .render(events => {
-//      val stock = Stock[Event](
-//        data = events,
-//        xaccessor = _.x,
-//        yaccessor = _.y,
-//        width = 420,
-//        height = 360,
-//        closed = true
-//      )
-//      val lines = stock.curves map { curve =>
-//        g(transform := "translate(50,0)",
-//          path(d := curve.area.path.print, fill := "none", stroke := "none"),
-//          path(d := curve.line.path.print, fill := "none", stroke := "none")
-//        )
-//      }
-//
-//      svg(width := 480, height := 400,
-//        lines
-//      )
-//    })
-//    .build
-//}

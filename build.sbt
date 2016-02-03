@@ -15,7 +15,7 @@ val app = crossProject.settings(
     "-language:implicitConversions",
     "-language:postfixOps"
   )
-).enablePlugins(JavaServerAppPackaging)
+).enablePlugins(JavaAppPackaging)
   .jsSettings(
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.8.0",
