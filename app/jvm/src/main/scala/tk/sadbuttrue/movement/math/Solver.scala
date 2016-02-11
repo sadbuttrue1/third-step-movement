@@ -6,6 +6,7 @@ import org.apache.commons.math3.distribution.NormalDistribution
 import org.apache.commons.math3.ode.nonstiff.DormandPrince54Integrator
 import org.apache.commons.math3.ode.sampling.{StepInterpolator, StepHandler}
 import org.apache.commons.math3.ode.{FirstOrderIntegrator, FirstOrderDifferentialEquations}
+import org.slf4j.LoggerFactory
 import tk.sadbuttrue.movement.util.model.{Result, Task}
 
 import tk.sadbuttrue.movement.util.model.DoubleWithErrorRandomHelper.doubleWithErrorToDouble
@@ -13,12 +14,14 @@ import tk.sadbuttrue.movement.math.Functions._
 import tk.sadbuttrue.movement.math.QuaternionHelper.rotate
 
 import breeze.plot._
+import com.typesafe.scalalogging._
 
 /**
   * Created by true on 27/01/16.
   */
 object Solver {
   def solve(task: Task): Result = {
+    val logger = Logger(LoggerFactory.getLogger(Solver.getClass))
     val integrator: FirstOrderIntegrator = new DormandPrince54Integrator(1.0e-8, task.T, 1.0e-10, 1.0e-10)
     val ode: FirstOrderDifferentialEquations = new MovementODE(task)
     val y0: Array[Double] = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0)
@@ -38,7 +41,7 @@ object Solver {
     integrator.addStepHandler(stepHandler)
     integrator.integrate(ode, 0.0, y0, task.T, y0)
 
-    println("DONE")
+    logger.info("DONE")
 
     val matr = new DenseMatrix[Double](14, result.length / 14, result)
 

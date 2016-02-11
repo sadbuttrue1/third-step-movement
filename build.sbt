@@ -48,7 +48,10 @@ val app = crossProject.settings(
     "org.scalanlp" %% "breeze" % "0.11.2",
     "org.scalanlp" %% "breeze-natives" % "0.11.2",
     "org.apache.commons" % "commons-math3" % "3.6",
-    "org.scalanlp" %% "breeze-viz" % "0.11.2"
+    "org.scalanlp" %% "breeze-viz" % "0.11.2",
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
+    "org.slf4j" % "slf4j-api" % "1.7.12",
+    "ch.qos.logback" % "logback-classic" % "1.1.3"
   )
 )
 
