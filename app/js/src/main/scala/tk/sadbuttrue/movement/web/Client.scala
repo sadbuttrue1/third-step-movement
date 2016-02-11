@@ -4,6 +4,7 @@ import japgolly.scalajs.react._
 import org.scalajs.dom._
 import org.scalajs.dom.ext.Ajax
 import org.scalajs.dom.raw.{HTMLParagraphElement, HTMLInputElement}
+import tk.sadbuttrue.movement.web.Line._
 
 import scala.concurrent.Future
 import scala.scalajs.js
@@ -37,10 +38,10 @@ object Client extends js.JSApp {
 
   case class State(
                     selected: Boolean,
-                    v: Option[Seq[Seq[(Double, Double)]]],
-                    a: Option[Seq[Seq[(Double, Double)]]],
-                    w_d: Option[Seq[Seq[(Double, Double)]]],
-                    q_d: Option[Seq[Seq[(Double, Double)]]]
+                    v: Option[(Seq[Seq[(Double, Double)]], Seq[String])],
+                    a: Option[(Seq[Seq[(Double, Double)]], Seq[String])],
+                    w_d: Option[(Seq[Seq[(Double, Double)]], Seq[String])],
+                    q_d: Option[(Seq[Seq[(Double, Double)]], Seq[String])]
                   )
 
   class Backend($: BackendScope[Unit, State]) {
@@ -57,33 +58,53 @@ object Client extends js.JSApp {
         Ajaxer[Api].calculate(task).
           call().map { result =>
           val v = Some(
-            List(
-              result.t.zip(result.v(0)).toList,
-              result.t.zip(result.v(1)).toList,
-              result.t.zip(result.v(2)).toList
-            )
+            (
+              List(
+                result.t.zip(result.v(0)).toList,
+                result.t.zip(result.v(1)).toList,
+                result.t.zip(result.v(2)).toList
+              ),
+              List(
+                "v_x", "v_y", "v_z"
+              )
+              )
           )
           val a = Some(
-            List(
-              result.t.zip(result.a(0)).toList,
-              result.t.zip(result.a(1)).toList,
-              result.t.zip(result.a(2)).toList
-            )
+            (
+              List(
+                result.t.zip(result.a(0)).toList,
+                result.t.zip(result.a(1)).toList,
+                result.t.zip(result.a(2)).toList
+              ),
+              List(
+                "a_x", "a_y", "a_z"
+              )
+              )
           )
           val w_d = Some(
-            List(
-              result.t.zip(result.w_d(0)).toList,
-              result.t.zip(result.w_d(1)).toList,
-              result.t.zip(result.w_d(2)).toList
-            )
+            (
+              List(
+                result.t.zip(result.w_d(0)).toList,
+                result.t.zip(result.w_d(1)).toList,
+                result.t.zip(result.w_d(2)).toList
+              ),
+              List(
+                "w_d_x", "w_d_y", "w_d_z"
+              )
+              )
           )
           val q_d = Some(
-            List(
-              result.t.zip(result.quat_d(0)).toList,
-              result.t.zip(result.quat_d(1)).toList,
-              result.t.zip(result.quat_d(2)).toList,
-              result.t.zip(result.quat_d(3)).toList
-            )
+            (
+              List(
+                result.t.zip(result.quat_d(0)).toList,
+                result.t.zip(result.quat_d(1)).toList,
+                result.t.zip(result.quat_d(2)).toList,
+                result.t.zip(result.quat_d(3)).toList
+              ),
+              List(
+                "q_d_0", "q_d_1", "q_d_2", "q_d_3"
+              )
+              )
           )
           $.modState(_.copy(
             v = v,
@@ -102,10 +123,10 @@ object Client extends js.JSApp {
         <.p(<.input(^.`type` := "file", ^.accept := "application/json", ^.multiple := false, ^.onChange ==> selected, ^.ref := jsonFile)),
         <.p(^.ref := output),
         <.p(<.input(^.`type` := "button", ^.value := "send", ^.onClick --> send, ^.disabled := !s.selected)),
-        s.v.fold(<.div)(data => <.div(<.p("v:"), Line.LineChart(data))),
-        s.a.fold(<.div)(data => <.div(<.p("a:"), Line.LineChart(data))),
-        s.w_d.fold(<.div)(data => <.div(<.p("w_d:"), Line.LineChart(data))),
-        s.q_d.fold(<.div)(data => <.div(<.p("q_d:"), Line.LineChart(data)))
+        s.v.fold(<.div)(data => <.div(<.p("v:"), LineChart(data))),
+        s.a.fold(<.div)(data => <.div(<.p("a:"), LineChart(data))),
+        s.w_d.fold(<.div)(data => <.div(<.p("w_d:"), LineChart(data))),
+        s.q_d.fold(<.div)(data => <.div(<.p("q_d:"), LineChart(data)))
       )
 
     }
