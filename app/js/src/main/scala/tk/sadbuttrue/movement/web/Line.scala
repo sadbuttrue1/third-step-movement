@@ -34,8 +34,8 @@ object Line {
         data = data,
         xaccessor = _._1,
         yaccessor = _._2,
-        width = 420,
-        height = 360,
+        width = 500,
+        height = 400,
         closed = true
       )
 
@@ -48,23 +48,49 @@ object Line {
       val xscale = stock.xscale
       val yscale = stock.yscale
       val axes = g(transform := "translate(20,0)",
-        line(x1 := xscale(xMin), y1 := yscale(yMin) + 10, x2 := xscale(xMin), y2 := yscale(yMax) - 10, stroke := "#333333"),
-        line(x1 := xscale(xMin) - 10, y1 := yscale(yMin), x2 := xscale(xMax) + 10, y2 := yscale(yMin), stroke := "#333333")
+        line(x1 := xscale(xMin), y1 := yscale(yMin) + 5, x2 := xscale(xMin), y2 := yscale(yMax) - 5, stroke := "#333333"),
+        line(x1 := xscale(xMin) - 5, y1 := yscale(yMin), x2 := xscale(xMax) + 5, y2 := yscale(yMin), stroke := "#333333")
+      )
+
+      val xStep = (xMax - xMin) / 10.0
+      val yStep = (yMax - yMin) / 10.0
+      val grid = g(transform := "translate(20,0)",
+        for (i <- 1 to 10) yield {
+          line(x1 := xscale(xMin + i * xStep), y1 := yscale(yMin) + 5, x2 := xscale(xMin + i * xStep), y2 := yscale(yMax) - 5, stroke := "black", strokeWidth := 0.1)
+        },
+        for (i <- 1 to 10) yield {
+          line(x1 := xscale(xMin) - 5, y1 := yscale(yMin + i * yStep), x2 := xscale(xMax) + 5, y2 := yscale(yMin + i * yStep), stroke := "black", strokeWidth := 0.1)
+        }
+      )
+
+      val xNumbers = g(
+        for (i <- 1 to 10) yield {
+          text(transform := s"translate(${xscale(xMin + i * xStep)}, ${yscale(yMin) + 10})", fontSize := 8)("%.1e" format xMin + i * xStep)
+        }
+      )
+
+      val yNumbers = g(
+        for (i <- 0 to 10) yield {
+          text(transform := s"translate(${xscale(xMin) + 5}, ${yscale(yMin + i * yStep)}) rotate(90)", fontSize := 8)("%.1e" format yMin + i * yStep)
+        }
       )
 
       val legends = stock.curves.map { curve =>
-        val translate = s"translate(20,${30 * curve.index})"
+        val translate = s"translate(520, ${30 * curve.index})"
         val name = names(curve.index)
         g(transform := translate,
           rect(width := 20, height := 20, fill := string(palette(curve.index))),
-          text(transform := "translate(50, 15)", fontSize := 12)(name)
+          text(transform := "translate(20, 15)", fontSize := 12)(name)
         )
       }
 
       svg(width := 640, height := 480,
         lines,
         legends,
-        axes
+        axes,
+        grid,
+        xNumbers,
+        yNumbers
       )
     })
     .build
