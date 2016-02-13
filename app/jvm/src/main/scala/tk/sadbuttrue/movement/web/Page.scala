@@ -8,11 +8,7 @@ object Page {
   val skeleton =
     html(
       head(
-        meta(httpEquiv := "Content-Type", content := "text/html; charset=UTF-8"),
-        link(
-          rel := "stylesheet",
-          href := "https://cdnjs.cloudflare.com/ajax/libs/pure/0.5.0/pure-min.css"
-        )
+        meta(httpEquiv := "Content-Type", content := "text/html; charset=UTF-8")
       ),
       body(
 //        onload := boot,
