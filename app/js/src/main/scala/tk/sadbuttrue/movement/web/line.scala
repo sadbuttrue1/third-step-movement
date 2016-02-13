@@ -15,32 +15,56 @@ object Line {
 
   val LineChart = ReactComponentB[(Seq[Seq[(Double, Double)]], Seq[String])]("Stock chart")
     .render(points => {
+      val data = points.props._1
+      val names = points.props._2
+      val xMax = data.map { line =>
+        line.maxBy(_._1)
+      }.maxBy(_._1)._1
+      val xMin = data.map { line =>
+        line.minBy(_._1)
+      }.minBy(_._1)._1
+      val yMax = data.map { line =>
+        line.maxBy(_._2)
+      }.maxBy(_._2)._2
+      val yMin = data.map { line =>
+        line.minBy(_._2)
+      }.minBy(_._2)._2
+
       val stock = Stock[(Double, Double)](
-        data = points.props._1,
+        data = data,
         xaccessor = _._1,
         yaccessor = _._2,
         width = 420,
         height = 360,
         closed = true
       )
+
       val lines = stock.curves map { curve =>
-        g(transform := "translate(0,0)",
+        g(transform := "translate(20,0)",
           path(d := curve.line.path.print, fill := "none", stroke := string(palette(curve.index)))
         )
       }
 
+      val xscale = stock.xscale
+      val yscale = stock.yscale
+      val axes = g(transform := "translate(20,0)",
+        line(x1 := xscale(xMin), y1 := yscale(yMin) + 10, x2 := xscale(xMin), y2 := yscale(yMax) - 10, stroke := "#333333"),
+        line(x1 := xscale(xMin) - 10, y1 := yscale(yMin), x2 := xscale(xMax) + 10, y2 := yscale(yMin), stroke := "#333333")
+      )
+
       val legends = stock.curves.map { curve =>
-        val translate = s"translate(0,${30 * curve.index})"
-        val name = points.props._2(curve.index)
+        val translate = s"translate(20,${30 * curve.index})"
+        val name = names(curve.index)
         g(transform := translate,
           rect(width := 20, height := 20, fill := string(palette(curve.index))),
-          text(transform := "translate(30, 15)", fontSize := 12)(name)
+          text(transform := "translate(50, 15)", fontSize := 12)(name)
         )
       }
 
       svg(width := 640, height := 480,
         lines,
-        legends
+        legends,
+        axes
       )
     })
     .build
