@@ -35,7 +35,7 @@ object Line {
         xaccessor = _._1,
         yaccessor = _._2,
         width = 500,
-        height = 400,
+        height = 460,
         closed = true
       )
 
@@ -65,13 +65,13 @@ object Line {
 
       val xNumbers = g(
         for (i <- 1 to 10) yield {
-          text(transform := s"translate(${xscale(xMin + i * xStep)}, ${yscale(yMin) + 10})", fontSize := 8)("%.1e" format xMin + i * xStep)
+          text(transform := s"translate(${xscale(xMin + i * xStep)}, ${yscale(yMin) + 10})", fontSize := 8)("%.2f" format xMin + i * xStep)
         }
       )
 
       val yNumbers = g(
         for (i <- 0 to 10) yield {
-          text(transform := s"translate(${xscale(xMin) + 5}, ${yscale(yMin + i * yStep)}) rotate(90)", fontSize := 8)("%.1e" format yMin + i * yStep)
+          text(transform := s"translate(${xscale(xMin) + 5}, ${yscale(yMin + i * yStep)}) rotate(90)", fontSize := 8)("%.2f" format yMin + i * yStep)
         }
       )
 
