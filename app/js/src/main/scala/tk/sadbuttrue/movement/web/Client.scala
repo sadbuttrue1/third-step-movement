@@ -10,7 +10,7 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import japgolly.scalajs.react.vdom.prefix_<^._
 
-import tk.sadbuttrue.movement.util.model.Task
+import tk.sadbuttrue.movement.util.model.{ServerTask, Task}
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js.annotation.JSExport
@@ -41,7 +41,8 @@ object Client extends js.JSApp {
                     v: Option[(Seq[Seq[(Double, Double)]], Seq[String])],
                     a: Option[(Seq[Seq[(Double, Double)]], Seq[String])],
                     w_d: Option[(Seq[Seq[(Double, Double)]], Seq[String])],
-                    q_d: Option[(Seq[Seq[(Double, Double)]], Seq[String])]
+                    q_d: Option[(Seq[Seq[(Double, Double)]], Seq[String])],
+                    task: Option[ServerTask]
                   )
 
   class Backend($: BackendScope[Unit, State]) {
@@ -110,11 +111,12 @@ object Client extends js.JSApp {
             v = v,
             a = a,
             w_d = w_d,
-            q_d = q_d
+            q_d = q_d,
+            task = Some(result.task)
           ))
         }
       }.runNow()
-      $.modState(_.copy(selected = false))
+      $.modState(_.copy(selected = true))
     }
 
     def render(s: State) = {
@@ -123,6 +125,7 @@ object Client extends js.JSApp {
         <.p(<.input(^.`type` := "file", ^.accept := "application/json", ^.multiple := false, ^.onChange ==> selected, ^.ref := jsonFile)),
         <.p(^.ref := output),
         <.p(<.input(^.`type` := "button", ^.value := "send", ^.onClick --> send, ^.disabled := !s.selected)),
+        s.task.fold(<.div)(data => <.div(<.p("Current task values:"), <.pre(data.toString))),
         s.v.fold(<.div)(data => <.div(<.p("v:"), LineChart(data))),
         s.a.fold(<.div)(data => <.div(<.p("a:"), LineChart(data))),
         s.w_d.fold(<.div)(data => <.div(<.p("w_d:"), LineChart(data))),
@@ -133,7 +136,7 @@ object Client extends js.JSApp {
   }
 
   val MovementApp = ReactComponentB[Unit]("MovementApp")
-    .initialState(State(false, None, None, None, None))
+    .initialState(State(false, None, None, None, None, None))
     .renderBackend[Backend]
     .buildU
 

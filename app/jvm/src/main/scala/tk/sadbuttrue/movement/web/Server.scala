@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import spray.http.{HttpEntity, MediaTypes}
 import spray.routing.SimpleRoutingApp
 import tk.sadbuttrue.movement.math.Solver
-import tk.sadbuttrue.movement.util.model.{Result, Task}
+import tk.sadbuttrue.movement.util.model.{ServerTask1, ServerTask, Result, Task}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -50,6 +50,6 @@ object Server extends SimpleRoutingApp with Api {
   }
 
   def calculate(task: Task): Result = {
-    Solver.solve(task)
+    Solver.solve(ServerTask1(task))
   }
 }

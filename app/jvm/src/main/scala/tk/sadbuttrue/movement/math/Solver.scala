@@ -2,14 +2,12 @@ package tk.sadbuttrue.movement.math
 
 import breeze.linalg.{DenseMatrix, DenseVector, cross}
 import org.apache.commons.math3.complex.Quaternion
-import org.apache.commons.math3.distribution.NormalDistribution
 import org.apache.commons.math3.ode.nonstiff.DormandPrince54Integrator
 import org.apache.commons.math3.ode.sampling.{StepInterpolator, StepHandler}
 import org.apache.commons.math3.ode.{FirstOrderIntegrator, FirstOrderDifferentialEquations}
 import org.slf4j.LoggerFactory
-import tk.sadbuttrue.movement.util.model.{Result, Task}
+import tk.sadbuttrue.movement.util.model.{ServerTask, Result}
 
-import tk.sadbuttrue.movement.util.model.DoubleWithErrorRandomHelper.doubleWithErrorToDouble
 import tk.sadbuttrue.movement.math.Functions._
 import tk.sadbuttrue.movement.math.QuaternionHelper.rotate
 
@@ -20,7 +18,7 @@ import com.typesafe.scalalogging._
   * Created by true on 27/01/16.
   */
 object Solver {
-  def solve(task: Task): Result = {
+  def solve(task: ServerTask): Result = {
     val logger = Logger(LoggerFactory.getLogger(Solver.getClass))
     val integrator: FirstOrderIntegrator = new DormandPrince54Integrator(1.0e-8, task.T, 1.0e-10, 1.0e-10)
     val ode: FirstOrderDifferentialEquations = new MovementODE(task)
@@ -59,14 +57,12 @@ object Solver {
     p.legend = true
     f.saveas("w.png")
 
-    Result(t, v, a, w_d, quat_d)
+    Result(t, v, a, w_d, quat_d, task)
   }
 }
 
 
-class MovementODE(val task: Task) extends FirstOrderDifferentialEquations {
-  private val random = new NormalDistribution
-
+class MovementODE(val task: ServerTask) extends FirstOrderDifferentialEquations {
   override def getDimension: Int = 13
 
   override def computeDerivatives(t: Double, y: Array[Double], yDot: Array[Double]): Unit = {
@@ -80,12 +76,7 @@ class MovementODE(val task: Task) extends FirstOrderDifferentialEquations {
     val Rho = rho(task)
     val M = cross(Rho, P_proj)
     val F = rotate(P_proj, quat)
-    val k = random.sample
-    val J = DenseVector[Double](
-      task.J(0).value + k * task.J(0).error,
-      task.J(1).value + k * task.J(1).error,
-      task.J(2).value + k * task.J(2).error
-    )
+    val J = DenseVector[Double](task.J.toArray)
 
     val m: Double = task.m
 

@@ -3,8 +3,7 @@ package tk.sadbuttrue.movement.math
 import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.numerics.{sin, toRadians, cos}
 import breeze.numerics.constants.Pi
-import tk.sadbuttrue.movement.util.model.Task
-import tk.sadbuttrue.movement.util.model.DoubleWithErrorRandomHelper.doubleWithErrorToDouble
+import tk.sadbuttrue.movement.util.model.ServerTask
 
 import scala.annotation.switch
 
@@ -12,7 +11,7 @@ import scala.annotation.switch
   * Created by true on 27/01/16.
   */
 object Functions {
-  def p(task: Task) = (t: Double) => {
+  def p(task: ServerTask) = (t: Double) => {
     val max = task.p.maxBy(_._1)._1
     val min = task.p.minBy(_._1)._1
     val range = (t: @switch) match {
@@ -38,7 +37,7 @@ object Functions {
     DenseVector[Double](-cos(alpha), -cos(beta) * sin(alpha), -cos(gamma) * sin(alpha))
   }
 
-  def rho(task: Task): DenseVector[Double] = {
+  def rho(task: ServerTask): DenseVector[Double] = {
     val x_c: Double = task.r_c(0)
     val y_c: Double = task.r_c(1)
     val z_c: Double = task.r_c(2)
