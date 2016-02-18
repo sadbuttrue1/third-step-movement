@@ -14,7 +14,7 @@ package tk.sadbuttrue.movement.util.model
   * Created by true on 25/01/16.
   */
 case class Task(m: DoubleWithError, T: Double,
-                L: Double, l: Double, R: Double,
+                L: Double, l: Double, D: Double,
                 p: Map[Double, DoubleWithError],
                 r_c: List[DoubleWithError],
                 J: List[DoubleWithError])

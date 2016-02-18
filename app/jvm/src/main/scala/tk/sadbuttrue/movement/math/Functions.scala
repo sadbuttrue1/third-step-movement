@@ -42,6 +42,6 @@ object Functions {
     val x_c: Double = task.r_c(0)
     val y_c: Double = task.r_c(1)
     val z_c: Double = task.r_c(2)
-    DenseVector[Double](task.L - task.l - x_c, cos(Pi / 4.0) * task.R - y_c, sin(Pi / 4.0) * task.R - z_c)
+    DenseVector[Double](task.L - task.l - x_c, cos(Pi / 4.0) * task.D / 2.0 - y_c, sin(Pi / 4.0) * task.D / 2.0 - z_c)
   }
 }
