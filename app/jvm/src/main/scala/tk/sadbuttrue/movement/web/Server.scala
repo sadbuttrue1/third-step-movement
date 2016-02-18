@@ -20,7 +20,7 @@ object Router extends autowire.Server[String, upickle.default.Reader, upickle.de
 object Server extends SimpleRoutingApp with Api {
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
-    startServer("localhost", port = 8080) {
+    startServer("0.0.0.0", port = 8080) {
       get {
         pathSingleSlash {
           complete {
