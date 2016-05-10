@@ -7,8 +7,8 @@ from scipy.constants import G
 from astropy.constants import M_earth, R_earth
 import math
 
-M = M_earth.value
-mu = G * M
+M_e = M_earth.value
+mu = G * M_e
 R = R_earth.value
 
 
@@ -27,6 +27,7 @@ class Parameters:
     D_NAME = "D"
     r_c_NAME = "r_c"
     p_NAME = "p"
+    h_NAME = "h"
     VALUE_NAME = "value"
     ERROR_NAME = "error"
     RANDOM_MU = 0
@@ -56,6 +57,11 @@ class Parameters:
             self.D = json_content[Parameters.D_NAME]
         else:
             raise ValueError("No D in json")
+
+        if Parameters.h_NAME in json_content:
+            self.h = json_content[Parameters.h_NAME]
+        else:
+            raise ValueError("No h in json")
 
         if Parameters.m_NAME in json_content and Parameters.ERROR_NAME in json_content[
             Parameters.m_NAME] and Parameters.VALUE_NAME in json_content[Parameters.m_NAME]:
@@ -115,12 +121,12 @@ def dq(t, q, parameters: Parameters):
     jx = J[0]
     jy = J[1]
     jz = J[2]
-    # r = np.array(q[0:2])
-    # v = np.array(q[2:4])
-    w = np.array(q[0:3])
-    psi = q[3]
-    theta = q[4]
-    phi = q[5]
+    r = np.array(q[0:2])
+    v = np.array(q[2:4])
+    w = np.array(q[4:7])
+    psi = q[7]
+    theta = q[8]
+    phi = q[9]
     A = rotation_matrix_from_euler(psi, theta, phi)
     M = 3 * mu / (R ** 3) * np.asarray(
         [(jz - jy) * A[2, 1] * A[2, 2],
@@ -154,11 +160,11 @@ def dq(t, q, parameters: Parameters):
         ]
     )
     angles_d = np.linalg.solve(a, b)
-    # k = G * (M + parameters.m)
-    # a = - k * r / (r ** 3)
-    # result = v
-    # result = np.append(result, a)
-    result = w_d
+    k = G * (M_e + parameters.m)
+    dx = - k * r / (np.linalg.norm(r) ** 3)
+    result = v
+    result = np.append(result, dx)
+    result = np.append(result, w_d)
     result = np.append(result, angles_d)
     return result
 
@@ -228,7 +234,8 @@ def rotation_matrix_from_euler(psi, theta, phi):
 
 
 parameters = Parameters(open("sample.json"))
-q_0 = np.array([0, 0, 0, 0, np.pi / 6, 0])
+vx0 = 8000
+q_0 = np.array([R + parameters.h, 0, 0, vx0, 0, 0, 0, 0, np.pi / 6, 0])
 tk = parameters.T * 100
 
 solver = ode(dq).set_integrator('dopri5', nsteps=1)
@@ -243,19 +250,38 @@ while solver.t < tk:
 
 sol_t = np.array(sol_t).reshape((len(sol_t), 1))
 sol_q = np.array(sol_q)
-wx = sol_q[:, 0]
-wy = sol_q[:, 1]
-wz = sol_q[:, 2]
 
+rx = sol_q[:, 0]
+ry = sol_q[:, 1]
+
+plt.plot(sol_t, rx, label="rx")
+plt.plot(sol_t, ry, label="ry")
+plt.grid()
+plt.legend()
+
+vx = sol_q[:, 2]
+vy = sol_q[:, 3]
+
+plt.figure()
+plt.plot(sol_t, vx, label="vx")
+plt.plot(sol_t, vy, label="vy")
+plt.grid()
+plt.legend()
+
+wx = sol_q[:, 4]
+wy = sol_q[:, 5]
+wz = sol_q[:, 6]
+
+plt.figure()
 plt.plot(sol_t, wx, label='w_x')
 plt.plot(sol_t, wy, label='w_y')
 plt.plot(sol_t, wz, label='w_z')
 plt.grid()
 plt.legend()
 
-psi = sol_q[:, 3]
-theta = sol_q[:, 4]
-phi = sol_q[:, 5]
+psi = sol_q[:, 7]
+theta = sol_q[:, 8]
+phi = sol_q[:, 9]
 plt.figure()
 plt.plot(sol_t, psi, label="psi")
 plt.plot(sol_t, theta, label="theta")
