@@ -117,12 +117,17 @@ class Parameters:
 
 
 def dq(t, q, parameters: Parameters):
+    r = np.array(q[0:2])
+    v = np.array(q[2:4])
+    k = G * (M_e + parameters.m)
+    dx = - k * r / (np.linalg.norm(r) ** 3)
+    result = v
+    result = np.append(result, dx)
+
     J = parameters.J
     jx = J[0]
     jy = J[1]
     jz = J[2]
-    r = np.array(q[0:2])
-    v = np.array(q[2:4])
     w = np.array(q[4:7])
     psi = q[7]
     theta = q[8]
@@ -160,10 +165,6 @@ def dq(t, q, parameters: Parameters):
         ]
     )
     angles_d = np.linalg.solve(a, b)
-    k = G * (M_e + parameters.m)
-    dx = - k * r / (np.linalg.norm(r) ** 3)
-    result = v
-    result = np.append(result, dx)
     result = np.append(result, w_d)
     result = np.append(result, angles_d)
     return result
@@ -234,9 +235,21 @@ def rotation_matrix_from_euler(psi, theta, phi):
 
 
 parameters = Parameters(open("sample.json"))
-vx0 = 8000
-q_0 = np.array([R + parameters.h, 0, 0, vx0, 0, 0, 0, 0, np.pi / 6, 0])
-tk = parameters.T * 100
+vy0 = 8000
+x0 = R + parameters.h
+q_0 = np.array([x0, 0, 0, vy0, 0, 0, 0, 0, np.pi / 6, 0])
+tk = parameters.T * 128
+
+k = G * (parameters.m + M_e)
+h = vy0 ** 2 - 2 * k / x0
+c = x0 * vy0
+f = np.sqrt(k ** 2 + h * c ** 2)
+e = f / k
+p = c ** 2 / k
+nu = np.linspace(0, 2 * np.pi, num=20)
+r = p / (1 + e * np.cos(nu))
+x = r * np.cos(nu)
+y = r * np.sin(nu)
 
 solver = ode(dq).set_integrator('dopri5', nsteps=1)
 solver.set_initial_value(q_0, 0).set_f_params(parameters)
@@ -265,6 +278,12 @@ vy = sol_q[:, 3]
 plt.figure()
 plt.plot(sol_t, vx, label="vx")
 plt.plot(sol_t, vy, label="vy")
+plt.grid()
+plt.legend()
+
+plt.figure()
+plt.plot(rx, ry, label="numeric")
+plt.plot(x, y, label="analytic")
 plt.grid()
 plt.legend()
 
