@@ -1,0 +1,274 @@
+\documentclass[10pt,pdf,hyperref={unicode}]{beamer}
+
+\usepackage{lmodern}
+
+% подключаем кириллицу 
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amssymb,amsfonts,amsmath,mathtext,cite,enumerate,amsthm,mathenv} %подключаем нужные пакеты расширений
+
+
+% тема оформления
+\usetheme{CambridgeUS}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.3\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\insertshortauthor
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.7\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertshorttitle\hspace*{3em}
+    \insertframenumber{} / \inserttotalframenumber\hspace*{1ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+
+% цветовая схема
+\usecolortheme{seahorse}
+
+\graphicspath{{images/}}%путь к рисункам
+
+\title{Движение пассивного спутника в гравитационном поле Земли}
+\author[Асланов Е.В.]{Студент: Асланов Евгений Владимирович, группа 1125 М 403\\ \and Научный руководитель: Асланов Владимир Степанович}
+ \date[\today]{}
+
+\begin{document}
+
+% титульный слайд
+\begin{frame}
+\titlepage
+\end{frame} 
+
+\begin{frame}
+\frametitle{Задачи}
+	Исследование поведения нефункционирующего КА относительно центра масс на продолжительном отрезке времени.
+	Подзадачи: 
+	\begin{itemize}
+		\item Установить влияние гравитационного момента на КА;
+		\item Определить влияние малые возмущения моментов. ($M = M_G + M_1$) 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Уравнения движения центра масс}
+	Запишем уравнения движения центра масс:
+	
+	\begin{equation*}
+		\begin{cases}
+			\frac{d\vec{r}}{dt} = \vec{V},\\
+			\frac{d\vec{V}}{dt} = -\frac{1}{r^3} G \left(M + m\right) \vec{r},
+		\end{cases}
+	\end{equation*}
+	где $G$ – гравитационная постоянная, $M$ – масса Земли, $m$ – масса КА.
+\end{frame}
+
+\begin{frame}
+\frametitle{Уравнения движения КА относительно центра масс}
+	\begin{equation*}
+		\begin{cases}
+			\frac{d\vec{\omega_x}}{dt} = \frac{M_x}{J_x} + \left(J_y - J_z\right) \frac{\omega_y \omega_z}{J_x},\\
+			\frac{d\vec{\omega_y}}{dt} = \frac{M_y}{J_y} + \left(J_z - J_x\right) \frac{\omega_z \omega_x}{J_y},\\
+			\frac{d\vec{\omega_z}}{dt} = \frac{M_z}{J_z} + \left(J_x - J_y\right) \frac{\omega_x \omega_y}{J_z},\\
+			\omega_x = \frac{d\psi}{dt} \sin \theta \sin \phi + \frac{d\theta}{dt} \cos \phi, \\
+			\omega_y = \frac{d\psi}{dt} \sin \theta \cos \phi - \frac{d\theta}{dt} \sin \phi, \\
+			\omega_z = \frac{d\psi}{dt} \cos \theta + \frac{d\phi}{dt},
+		\end{cases}
+	\end{equation*}
+	где $M_x$, $M_y$, $M_z$ – проекции момента сил тяготения, равные $M=\begin{pmatrix}\frac{3 GM}{R^3} (J_z - J_y) a_{32} a_{33} & \frac{3 GM}{R^3} (J_x - J_z) a_{33} a_{31} & \frac{3 GM}{R^3} (J_y - J_x) a_{31} a_{32}\end{pmatrix}$; $J_x$, $J_y$, $J_z$ – моменты инерции тела; $a_{31}$, $a_{32}$, $a_{33}$ – элементы матрицы поворотов.
+\end{frame}
+\begin{frame}
+\frametitle{Вывод уравнений движения для динамически-симметрического КА в каноническом виде}
+	Проекции абсолютной угловой скорости:
+	
+	\begin{equation}
+	\label{eq:angle_v}
+		\begin{cases}
+			\omega_x = \dot{\psi} a_{31} + \dot{\theta} \cos \phi + \omega_0 a_{21}, \\
+			\omega_y = \dot{\psi} a_{32} - \dot{\theta} \sin \phi + \omega_0 a_{22}, \\
+			\omega_z = \dot{\psi} a_{33} + \dot{\phi} + \omega_0 a_{23}.
+		\end{cases}
+	\end{equation}
+	
+	Кинетическая энергия:
+	
+	\begin{equation}
+	\label{eq:kinetic}
+		T = \frac{1}{2} J_x (\omega_x^2 + \omega_y^2) + \frac{1}{2} J_z \omega_z^2.
+	\end{equation}
+	
+	Потенциальная энергия:
+	
+	\begin{equation*}
+		\Pi = \frac{3}{2} \omega_0^2 \left(J_z - J_x \right) \cos^2 \theta.
+	\end{equation*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Функция Гамильтона}
+	Функция Гамильтона:
+	
+	\begin{equation*}
+		H = p_\phi \dot{\phi} + p_\psi \dot{\psi} + p_\theta \dot{\theta} - L,
+	\end{equation*}
+	где $L = T - \Pi$ – функция Лагранжа, $p_\phi = \frac{\partial{T}}{\partial{\dot{\phi}}}$, $p_\psi = \frac{\partial{T}}{\partial{\dot{\psi}}}$, $p_\theta = \frac{\partial{T}}{\partial{\dot{\theta}}}$ – обобщенные импульсы. 
+	
+	Подставив (\ref{eq:angle_v}) в (\ref{eq:kinetic}) и взяв частные производные, получим:
+	
+	\begin{equation*}
+		\begin{cases}
+			p_\phi = J_z \omega_z,\\
+			p_\psi = J_x \left(\dot{\psi} \sin^2 \theta + \omega_0 \cos \psi \sin \theta \cos \theta \right) + J_z \omega_z \cos \theta, \\
+			p_\theta = J_x \left(\dot{\theta} + \omega_0 \sin \psi \right).
+		\end{cases}
+	\end{equation*}
+	
+	И получим:
+	\begin{equation*}
+		\begin{cases}
+			\dot{\theta} = \frac{p_\theta}{J_x} - \omega_0 \sin\psi, \\
+			\dot{\psi} = \frac{p_\psi - J_z \omega_z \cos \theta}{J_x \sin^2 \theta} - \frac{\omega_0 \cos \psi}{\tan \theta},\\
+			\dot{\phi} = \omega_z + \omega_0 \cos \psi \sin \theta - \dot{\psi} \cos \theta.
+		\end{cases}
+	\end{equation*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Функция Гамильтона}
+	\begin{equation*}
+		\begin{split}
+			H &= \frac{1}{2} J_x \dot{\psi}^2 \sin^2 \theta + \frac{1}{2} J_x \dot{\theta}^2 + J_z \omega_z^2 +  J_z \omega_z \omega_0 \cos\psi \sin\theta + \\
+			&+\frac{1}{2} \omega_0^2 J_x \cos^2\psi\sin^2\theta	+\frac{3}{2}  \omega_0^2 \left(J_z - J_x \right)\cos^2\theta
+		\end{split}
+	\end{equation*}	
+	
+	Подставив $\dot{\psi}$, $\dot{\theta}$ и $p_\phi = J_z \omega_z$ получим, что $H$ не зависит явно от $\phi$. Следовательно, $\phi$ циклическая и ей отвечает циклический интеграл
+	\begin{equation*}
+		p_\phi = const
+	\end{equation*}
+	или
+	\begin{equation*}
+		J_z \omega_z = J_z \omega_{z0}. 
+	\end{equation*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Функция Гамильтона}
+	Перейдем к безразмерным величинам:
+	\begin{equation*}
+		\begin {split}
+			&\bar{p}_\psi = \frac{p_\psi}{J_x \omega_o}, \\
+			&\bar{p}_\theta = \frac{p_\theta}{J_x \omega_o}, \\
+			&\bar{p}_\phi = \frac{p_\phi}{J_x \omega_o}, \\
+			&\tau = \omega_0 t.
+		\end{split}
+	\end{equation*}
+	
+	Итоговый вид:
+	\begin{equation*}
+		\begin{split}
+			H &= \frac{\bar{p}_\psi^2}{2 \sin^2 \theta} + \frac{\bar{p}_\theta^2}{2} - \frac{\bar{p}_\psi \cos \psi}{\tan \theta} - \alpha \beta \bar{p}_\psi\frac{\cos \theta}{\sin^2 \theta} - \bar{p}_\theta \sin \psi + \alpha \beta \frac{\cos\psi}{\sin \theta} +\\
+			&+ \frac{\alpha^2 \beta^2}{2 \tan^2 \theta} + \frac{3}{2} (\alpha - 1) \cos^2 \theta,
+		\end{split}
+	\end{equation*}
+	где $\beta = \frac{\omega_{z0}}{\omega_0}$, $\alpha = \frac{J_z}{J_x}$.
+\end{frame}
+
+\begin{frame}
+\frametitle{Уравнения движения в каноническом виде}
+	\begin{equation*}
+		\begin{cases}
+			\frac{d\bar{p}_\psi}{d\tau} = - \frac{\partial H}{\partial \psi},\\
+			\frac{d\psi}{d\tau} = \frac{\partial H}{\partial \bar{p}_\psi},\\
+			\frac{d\bar{p}_\theta}{d\tau} = - \frac{\partial H}{\partial \theta},\\
+			\frac{d\theta}{d\tau} = \frac{\partial H}{\partial \bar{p}_\theta}.
+		\end{cases}
+	\end{equation*}
+	
+	В явном виде:
+	\begin{equation*}
+		\begin{cases}
+			\dot{\bar{p}}_\psi = - \left( \frac{\bar{p}_\psi}{\tan \theta} - \frac{\alpha\beta}{\sin \theta} \right) \sin \psi + \bar{p}_\theta \cos \psi, \\
+			\dot{\bar{p}}_\theta = \frac{\bar{p}_\psi^2}{\sin^3 \theta} \cos \theta - \frac{ \bar{p}_\psi}{\sin^2 \theta} \cos \psi - \alpha \beta \bar{p}_\psi \frac{1 + \cos^2\theta}{\sin^3 \theta} + \alpha \beta \frac{\cos \psi}{\sin^2 \theta} \cos \theta + \\
+			+ \frac{\alpha^2 \beta^2}{\tan \theta \sin^2 \theta} + 3 \left(\alpha -1\right) \cos \theta \sin \theta, \\
+			\dot{\psi} = \frac{\bar{p}_\psi}{\sin^2 \theta} - \frac{\cos \psi}{\tan \theta} - \alpha\beta \frac{\cos\theta}{\sin^2 \theta}, \\
+			\dot{\theta} = \bar{p}_\theta - \sin \psi.
+		\end{cases}
+	\end{equation*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Устойчивость стационарных положений}
+	$\theta_0 = \frac{\pi}{2}$, $p_\psi^0 = 0$, $p_\theta^0 = \sin \psi_0$, $\cos \psi_0 = -\alpha\beta$
+	
+	\begin{columns}[onlytextwidth]
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=0.5\paperwidth]{stat_1_theta.png}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=0.5\paperwidth]{stat_1_psi.png}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Устойчивость стационарных положений}
+	$\theta_0 = \frac{\pi}{2}$, $p_\psi^0 = 0$, $p_\theta^0 = 0$, $\sin \psi_0 = 0$
+	
+	\begin{columns}[onlytextwidth]
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=0.5\paperwidth]{stat_2_theta.png}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=0.5\paperwidth]{stat_2_psi.png}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Устойчивость стационарных положений}
+	$\psi_0 = 0$, $p_\theta^0 = 0$, $p_\psi^0 = 3(\alpha - 1) \sin \theta_0 \cos \theta_0$, $\sin \theta_0 = \frac{\alpha\beta}{3 \alpha - 4}$
+	
+	\begin{columns}[onlytextwidth]
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=0.5\paperwidth]{stat_3_theta.png}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=0.5\paperwidth]{stat_3_psi.png}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Заключение}
+	В данной работе повторены выводы Белецкого и записаны стационарные положения. Проверена численно их устойчивость.
+	
+	В дальнейшем планируется доработать модель для учета влияния малых возмущений, связанных с несферичностью Земли, воздействием аэродинамических сил, солнечным давлением и так далее.
+\end{frame}
+
+\begin{frame}
+	\begin{center}
+		Спасибо за внимание!
+	\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Список источников}    
+	\begin{thebibliography}{10}    
+		\beamertemplatebookbibitems
+ 		\bibitem{Markeev}
+		А.П. Маркеев
+		\newblock {\em Теоретическая механика}.
+		\newblock Физматлит, 1990.    
+		\beamertemplatebookbibitems
+ 		\bibitem{Belecki}
+		В.В. Белецкий
+		\newblock {\em Движение спутника относительно центра масс в гравитационном поле}.
+		\newblock Издательство Московского университета, 1975.
+	\end{thebibliography}
+\end{frame}
+\end{document}
